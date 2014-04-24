@@ -31,10 +31,6 @@ class php(
   }
   
   if $certificate_password {
-    package { [ 'expect', 'tcl' ] :
-      ensure => present,
-    }
-    
     if ($operatingsystem == 'Amazon') or ($osfamily == 'RedHat') {
       package { 'mod_ssl' :
         ensure  => present,
@@ -49,17 +45,17 @@ class php(
     }
   }
   
+  package { $php::params::php_packages :
+    ensure  => present,
+    require => Package['apache'], 
+  }
+  
   service { 'apache-service':
     ensure     => running,
     name       => $php::params::apache_service,
     hasstatus  => true,
     hasrestart => true,
     enable     => true,
-    require    => Package['apache'],
-  }
-
-  package { 'php' :
-    ensure => present,
-    name   => $php::params::php_packages,
+    require    => Package[$php::params::php_packages],
   }
 }
