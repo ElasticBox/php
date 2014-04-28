@@ -7,6 +7,14 @@ CertificatePassword=${CertificatePassword//$/\\$}
 DestinationPath=$4
 
 if [ -f /etc/yum.conf ]; then
+  if [ -d backup_config ]; then
+    cp backup_config/httpd_conf.bak /etc/httpd/conf/httpd.conf
+    cp backup_config/ssl_conf.bak /etc/httpd/conf.d/ssl.conf
+  else
+    mkdir backup_config
+    cp /etc/httpd/conf/httpd.conf backup_config/httpd_conf.bak
+    cp /etc/httpd/conf.d/ssl.conf backup_config/ssl_conf.bak
+  fi
 	sed -e "/DirectoryIndex/ c\ DirectoryIndex index.html index.htm index.shtml index.cgi index.php index.php3" -i  /etc/httpd/conf/httpd.conf
 	sed -e "s:Listen 80:Listen $http:g" -i /etc/httpd/conf/httpd.conf
 	if [ -d $DestinationPath ] ; then
@@ -14,6 +22,15 @@ if [ -f /etc/yum.conf ]; then
 	    sed -e "s:/var/www:$DestinationPath:g" -i /etc/httpd/conf/httpd.conf
 	fi
 elif [ -f /etc/debian_version ]; then
+  if [ -d backup_config ]; then
+    cp backup_config/ports_conf.bak /etc/apache2/ports.conf 
+    cp backup_config/default.bak /etc/apache2/sites-available/default
+  else
+    mkdir backup_config
+    cp /etc/apache2/ports.conf backup_config/ports_conf.bak
+    cp /etc/apache2/sites-available/default backup_config/default.bak
+  fi
+  cp /etc/apache2/sites-available/default-ssl /etc/apache2/sites-available/ssl
 	sed -e "s:80:$http:g" -i  /etc/apache2/ports.conf	
 	sed -e "s:80:$http:g" -i /etc/apache2/sites-available/default
 	sed -e "s:443:$https:g" -i /etc/apache2/ports.conf
