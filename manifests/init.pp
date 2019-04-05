@@ -55,7 +55,6 @@ class php(
     name       => $php::params::apache_service,
     hasstatus  => true,
     hasrestart => true,
-    enable     => true,
     require    => Package[$php::params::php_packages],
   }
 }
